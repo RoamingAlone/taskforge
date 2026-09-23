@@ -6,6 +6,7 @@ import {
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/RoamingAlone/taskforge/internal/config"
 }
 
 func main() {
@@ -22,7 +23,13 @@ func main() {
 
 	log.Println("TaskForge running on http://localhost:8080")
 
-	if err := http.ListenAndServe(":8080", router); err != nil {
+	cfg := config.Load()
+
+	addr := ":" + cfg.Port
+
+	log.Printf("TaskForge running on http://localhost%s", addr)
+
+	if err := http.ListenAndServe(addr, router); err != nil {
 		log.Fatal(err)
 	}
 }
