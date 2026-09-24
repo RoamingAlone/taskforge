@@ -1,8 +1,11 @@
 package config
 
-import {
-	"os"	
-}
+import (
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 type Config struct {
 	Port string

@@ -1,13 +1,13 @@
 package main
 
-import {
+import (
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/RoamingAlone/taskforge/internal/config"
-}
+	"github.com/go-chi/chi/v5"
+)
 
 func main() {
 	router := chi.NewRouter()
