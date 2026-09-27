@@ -8,6 +8,7 @@ import (
 
 	"github.com/RoamingAlone/taskforge/internal/config"
 	"github.com/RoamingAlone/taskforge/internal/database"
+	"github.com/RoamingAlone/taskforge/internal/user"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -33,7 +34,14 @@ func main() {
 
 	log.Println("Connected to PostgreSQL")
 
+	userRepo := user.NewRepository(db)
+	userService := user.NewService(userRepo)
+	userHandler := user.NewHandler(userService)
+
 	router := chi.NewRouter()
+
+	router.Get("/register", userHandler.RegisterForm)
+	router.Post("/register", userHandler.RegisterSubmit)
 
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "TaskForge is running!")
