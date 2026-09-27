@@ -5,7 +5,12 @@ import (
 	"time"
 )
 
-var ErrNotFound = errors.New("user not found")
+var (
+	ErrNotFound         = errors.New("user not found")
+	ErrEmailRequired    = errors.New("email is required")
+	ErrPasswordRequired = errors.New("password is required")
+	ErrPasswordTooShort = errors.New("password must be at least 8 characters")
+)
 
 type User struct {
 	ID           int64
