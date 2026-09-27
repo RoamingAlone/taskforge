@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"html/template"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -33,9 +34,30 @@ func (f *fakeUserService) Register(
 	}, nil
 }
 
+func newTestHandler(
+	t *testing.T,
+	service UserService,
+) *Handler {
+	t.Helper()
+
+	tmpl, err := template.New("register").Parse(`
+		<!DOCTYPE html>
+		<html>
+		<body>
+			<h1>Register</h1>
+		</body>
+		</html>
+	`)
+	if err != nil {
+		t.Fatalf("parse test template: %v", err)
+	}
+
+	return NewHandler(service, tmpl)
+}
+
 func TestHandlerRegisterSubmit(t *testing.T) {
 	service := &fakeUserService{}
-	handler := NewHandler(service)
+	handler := newTestHandler(t, service)
 
 	form := url.Values{}
 	form.Set("email", "test@example.com")
@@ -124,7 +146,7 @@ func TestHandlerRegisterSubmitErrors(t *testing.T) {
 				registerErr: tt.serviceErr,
 			}
 
-			handler := NewHandler(service)
+			handler := newTestHandler(t, service)
 
 			form := url.Values{}
 			form.Set("email", "test@example.com")
@@ -158,5 +180,37 @@ func TestHandlerRegisterSubmitErrors(t *testing.T) {
 				)
 			}
 		})
+	}
+}
+
+func TestHandlerRegisterForm(t *testing.T) {
+	service := &fakeUserService{}
+	handler := newTestHandler(t, service)
+
+	req := httptest.NewRequest(
+		http.MethodGet,
+		"/register",
+		nil,
+	)
+
+	recorder := httptest.NewRecorder()
+
+	handler.RegisterForm(recorder, req)
+
+	response := recorder.Result()
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		t.Errorf(
+			"expected status %d, got %d",
+			http.StatusOK,
+			response.StatusCode,
+		)
+	}
+
+	if !strings.Contains(recorder.Body.String(), "<h1>Register</h1>") {
+		t.Errorf(
+			"expected response body to contain registration heading",
+		)
 	}
 }

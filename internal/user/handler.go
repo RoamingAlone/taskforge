@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"net/http"
+
+	"html/template"
 )
 
 type UserService interface {
@@ -14,12 +16,17 @@ type UserService interface {
 }
 
 type Handler struct {
-	service UserService
+	service          UserService
+	registerTemplate *template.Template
 }
 
-func NewHandler(service UserService) *Handler {
+func NewHandler(
+	service UserService,
+	registerTemplate *template.Template,
+) *Handler {
 	return &Handler{
-		service: service,
+		service:          service,
+		registerTemplate: registerTemplate,
 	}
 }
 
@@ -27,56 +34,13 @@ func (h *Handler) RegisterForm(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	_, err := w.Write([]byte(`
-		<!DOCTYPE html>
-		<html lang="en">
-		<head>
-			<meta charset="UTF-8">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>Register | TaskForge</title>
-		</head>
-		<body>
-			<h1>Create an account</h1>
-
-			<form method="POST" action="/register">
-				<label>
-					Email
-					<input type="email" name="email" required>
-				</label>
-
-				<br>
-
-				<label>
-					First Name
-					<input type="text" name="first_name">
-				</label>
-
-				<br>
-
-				<label>
-					Last Name
-					<input type="text" name="last_name">
-				</label>
-
-				<br>
-
-				<label>
-					Password
-					<input type="password" name="password" required>
-				</label>
-
-				<br>
-
-				<button type="submit">Register</button>
-			</form>
-		</body>
-		</html>
-	`))
-
+	err := h.registerTemplate.Execute(w, nil)
 	if err != nil {
-		http.Error(w, "failed to render page", http.StatusInternalServerError)
+		http.Error(
+			w,
+			"failed to render page",
+			http.StatusInternalServerError,
+		)
 	}
 }
 

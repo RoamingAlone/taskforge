@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 
@@ -36,8 +37,18 @@ func main() {
 
 	userRepo := user.NewRepository(db)
 	userService := user.NewService(userRepo)
-	userHandler := user.NewHandler(userService)
 
+	registerTemplate, err := template.ParseFiles(
+		"web/templates/register.html",
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	userHandler := user.NewHandler(
+		userService,
+		registerTemplate,
+	)
 	router := chi.NewRouter()
 
 	router.Get("/register", userHandler.RegisterForm)
