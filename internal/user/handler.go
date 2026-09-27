@@ -34,7 +34,12 @@ func (h *Handler) RegisterForm(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	err := h.registerTemplate.Execute(w, nil)
+	err := h.registerTemplate.ExecuteTemplate(
+		w,
+		"base",
+		nil,
+	)
+
 	if err != nil {
 		http.Error(
 			w,

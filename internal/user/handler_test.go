@@ -41,13 +41,16 @@ func newTestHandler(
 	t.Helper()
 
 	tmpl, err := template.New("register").Parse(`
-		<!DOCTYPE html>
-		<html>
-		<body>
-			<h1>Register</h1>
-		</body>
-		</html>
+		{{ define "base" }}
+			<!DOCTYPE html>
+			<html>
+			<body>
+				<h1>Register</h1>
+			</body>
+			</html>
+		{{ end }}
 	`)
+
 	if err != nil {
 		t.Fatalf("parse test template: %v", err)
 	}

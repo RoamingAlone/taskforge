@@ -39,6 +39,7 @@ func main() {
 	userService := user.NewService(userRepo)
 
 	registerTemplate, err := template.ParseFiles(
+		"web/templates/base.html",
 		"web/templates/register.html",
 	)
 	if err != nil {
