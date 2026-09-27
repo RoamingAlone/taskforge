@@ -6,10 +6,11 @@ import (
 )
 
 var (
-	ErrNotFound         = errors.New("user not found")
-	ErrEmailRequired    = errors.New("email is required")
-	ErrPasswordRequired = errors.New("password is required")
-	ErrPasswordTooShort = errors.New("password must be at least 8 characters")
+	ErrNotFound           = errors.New("user not found")
+	ErrEmailRequired      = errors.New("email is required")
+	ErrPasswordRequired   = errors.New("password is required")
+	ErrPasswordTooShort   = errors.New("password must be at least 8 characters")
+	ErrEmailAlreadyExists = errors.New("email already exists")
 )
 
 type User struct {

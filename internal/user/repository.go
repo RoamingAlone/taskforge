@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -63,6 +64,12 @@ func (r *Repository) Create(
 	)
 
 	if err != nil {
+		var pgErr *pgconn.PgError
+
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return nil, ErrEmailAlreadyExists
+		}
+
 		return nil, err
 	}
 

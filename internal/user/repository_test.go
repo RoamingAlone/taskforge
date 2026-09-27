@@ -66,6 +66,21 @@ func TestRepositoryUserLifecycle(t *testing.T) {
 		)
 	}
 
+	_, err = repo.Create(
+		ctx,
+		"test@example.com",
+		"another-password-hash",
+		"Another",
+		"User",
+	)
+
+	if !errors.Is(err, ErrEmailAlreadyExists) {
+		t.Errorf(
+			"expected ErrEmailAlreadyExists, got %v",
+			err,
+		)
+	}
+
 	foundUser, err := repo.GetByID(ctx, createdUser.ID)
 	if err != nil {
 		t.Fatal(err)

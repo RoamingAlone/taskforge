@@ -13,6 +13,7 @@ type fakeUserRepository struct {
 	createPasswordHash string
 	createFirstName    string
 	createLastName     string
+	createErr          error
 }
 
 func (f *fakeUserRepository) Create(
@@ -22,6 +23,10 @@ func (f *fakeUserRepository) Create(
 	firstName string,
 	lastName string,
 ) (*User, error) {
+	if f.createErr != nil {
+		return nil, f.createErr
+	}
+
 	f.createEmail = email
 	f.createPasswordHash = passwordHash
 	f.createFirstName = firstName
@@ -176,5 +181,30 @@ func TestServiceRegisterValidation(t *testing.T) {
 				)
 			}
 		})
+	}
+}
+
+func TestServiceRegisterDuplicateEmail(t *testing.T) {
+	repo := &fakeUserRepository{
+		createErr: ErrEmailAlreadyExists,
+	}
+
+	service := NewService(repo)
+
+	_, err := service.Register(
+		context.Background(),
+		RegisterInput{
+			Email:     "test@example.com",
+			Password:  "supersecret123",
+			FirstName: "Test",
+			LastName:  "User",
+		},
+	)
+
+	if !errors.Is(err, ErrEmailAlreadyExists) {
+		t.Errorf(
+			"expected ErrEmailAlreadyExists, got %v",
+			err,
+		)
 	}
 }
