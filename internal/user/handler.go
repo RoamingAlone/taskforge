@@ -20,6 +20,13 @@ type Handler struct {
 	registerTemplate *template.Template
 }
 
+type RegisterPageData struct {
+	Error     string
+	Email     string
+	FirstName string
+	LastName  string
+}
+
 func NewHandler(
 	service UserService,
 	registerTemplate *template.Template,
@@ -34,12 +41,25 @@ func (h *Handler) RegisterForm(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	h.renderRegister(
+		w,
+		http.StatusOK,
+		RegisterPageData{},
+	)
+}
+
+func (h *Handler) renderRegister(
+	w http.ResponseWriter,
+	status int,
+	data RegisterPageData,
+) {
+	w.WriteHeader(status)
+
 	err := h.registerTemplate.ExecuteTemplate(
 		w,
 		"base",
-		nil,
+		data,
 	)
-
 	if err != nil {
 		http.Error(
 			w,
@@ -66,20 +86,35 @@ func (h *Handler) RegisterSubmit(
 		LastName:  r.FormValue("last_name"),
 	}
 
+	pageData := RegisterPageData{
+		Email:     input.Email,
+		FirstName: input.FirstName,
+		LastName:  input.LastName,
+	}
+
 	_, err = h.service.Register(r.Context(), input)
 	if err != nil {
 		switch {
-		case errors.Is(err, ErrEmailRequired):
-			http.Error(w, err.Error(), http.StatusBadRequest)
+		case errors.Is(err, ErrEmailRequired),
+			errors.Is(err, ErrPasswordRequired),
+			errors.Is(err, ErrPasswordTooShort):
 
-		case errors.Is(err, ErrPasswordRequired):
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			pageData.Error = err.Error()
 
-		case errors.Is(err, ErrPasswordTooShort):
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			h.renderRegister(
+				w,
+				http.StatusBadRequest,
+				pageData,
+			)
 
 		case errors.Is(err, ErrEmailAlreadyExists):
-			http.Error(w, err.Error(), http.StatusConflict)
+			pageData.Error = err.Error()
+
+			h.renderRegister(
+				w,
+				http.StatusConflict,
+				pageData,
+			)
 
 		default:
 			http.Error(

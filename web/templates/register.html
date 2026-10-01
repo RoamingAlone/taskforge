@@ -1,81 +1,73 @@
-{{ define "title" }}Register{{ end }}
-
-{{ define "content" }}
+{{ define "title" }}Register{{ end }} {{ define "content" }}
 <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h1 class="h3 mb-4">Create an account</h1>
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h3 mb-4">Create an account</h1>
 
-                <form method="POST" action="/register">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">
-                            Email
-                        </label>
+        {{ if .Error }}
+        <div class="alert alert-danger" role="alert">{{ .Error }}</div>
+        {{ end }}
 
-                        <input
-                            type="email"
-                            class="form-control"
-                            id="email"
-                            name="email"
-                            required
-                        >
-                    </div>
+        <form method="POST" action="/register">
+          <div class="mb-3">
+            <label for="email" class="form-label"> Email </label>
 
-                    <div class="mb-3">
-                        <label for="first_name" class="form-label">
-                            First Name
-                        </label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              value="{{ .Email }}"
+              required
+            />
+          </div>
 
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="first_name"
-                            name="first_name"
-                        >
-                    </div>
+          <div class="mb-3">
+            <label for="first_name" class="form-label"> First Name </label>
 
-                    <div class="mb-3">
-                        <label for="last_name" class="form-label">
-                            Last Name
-                        </label>
+            <input
+              type="text"
+              class="form-control"
+              id="first_name"
+              name="first_name"
+              value="{{ .FirstName }}"
+            />
+          </div>
 
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="last_name"
-                            name="last_name"
-                        >
-                    </div>
+          <div class="mb-3">
+            <label for="last_name" class="form-label"> Last Name </label>
 
-                    <div class="mb-4">
-                        <label for="password" class="form-label">
-                            Password
-                        </label>
+            <input
+              type="text"
+              class="form-control"
+              id="last_name"
+              name="last_name"
+              value="{{ .LastName }}"
+            />
+          </div>
 
-                        <input
-                            type="password"
-                            class="form-control"
-                            id="password"
-                            name="password"
-                            minlength="8"
-                            required
-                        >
+          <div class="mb-4">
+            <label for="password" class="form-label"> Password </label>
 
-                        <div class="form-text">
-                            Password must be at least 8 characters.
-                        </div>
-                    </div>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              minlength="8"
+              required
+            />
 
-                    <button
-                        type="submit"
-                        class="btn btn-primary w-100"
-                    >
-                        Create Account
-                    </button>
-                </form>
-            </div>
-        </div>
+            <div class="form-text">Password must be at least 8 characters.</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            Create Account
+          </button>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {{ end }}

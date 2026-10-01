@@ -46,6 +46,15 @@ func newTestHandler(
 			<html>
 			<body>
 				<h1>Register</h1>
+
+				{{ if .Error }}
+					<div>{{ .Error }}</div>
+				{{ end }}
+
+				<input name="email" value="{{ .Email }}">
+				<input name="first_name" value="{{ .FirstName }}">
+				<input name="last_name" value="{{ .LastName }}">
+				<input name="password" type="password">
 			</body>
 			</html>
 		{{ end }}
@@ -181,6 +190,41 @@ func TestHandlerRegisterSubmitErrors(t *testing.T) {
 					tt.expectedStatus,
 					response.StatusCode,
 				)
+			}
+
+			if errors.Is(tt.serviceErr, ErrEmailAlreadyExists) {
+				body := recorder.Body.String()
+
+				if !strings.Contains(body, "email already exists") {
+					t.Errorf(
+						"expected response body to contain duplicate email error",
+					)
+				}
+
+				if !strings.Contains(body, "test@example.com") {
+					t.Errorf(
+						"expected response body to preserve email",
+					)
+				}
+
+				if !strings.Contains(body, "Test") {
+					t.Errorf(
+						"expected response body to preserve first name",
+					)
+				}
+
+				if !strings.Contains(body, "User") {
+					t.Errorf(
+						"expected response body to preserve last name",
+					)
+				}
+
+				if strings.Contains(body, "supersecret123") {
+					t.Errorf(
+						"expected response body not to contain password",
+					)
+
+				}
 			}
 		})
 	}
